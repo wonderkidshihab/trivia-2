@@ -1,3 +1,4 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:trivia/app/data/models/question_model.dart';
@@ -18,8 +19,7 @@ class _QuestionWidgetState extends State<QuestionWidget> {
   final QuizController quizController = Get.find();
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
+    return ListView(
       children: [
         Container(
           margin: const EdgeInsets.all(20),
@@ -28,14 +28,18 @@ class _QuestionWidgetState extends State<QuestionWidget> {
             borderRadius: BorderRadius.circular(20),
             border: Border.all(color: Theme.of(context).primaryColor),
           ),
-          constraints: const BoxConstraints(maxWidth: 500, maxHeight: 300),
+          constraints: const BoxConstraints(maxWidth: 500, maxHeight: 400),
           alignment: Alignment.center,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
                 widget.question.question ?? "N/A",
-                style: const TextStyle(fontSize: 20),
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).primaryColor,
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 20),
@@ -45,18 +49,11 @@ class _QuestionWidgetState extends State<QuestionWidget> {
                 spacing: 10,
                 children: widget.question.answers
                     .map(
-                      (answer) => ChoiceChip(
-                        label: Text(answer),
-                        selected: selectedAnswer == answer,
-                        onSelected: (value) {
-                          setState(() {
-                            if (answer == selectedAnswer) {
-                              selectedAnswer = null;
-                            } else {
-                              selectedAnswer = answer;
-                            }
-                          });
-                        },
+                      (answer) => Draggable<String>(
+                        feedback: Material(child: Chip(label: Text(answer))),
+                        data: answer,
+                        childWhenDragging: Chip(label: Text(answer)),
+                        child: Chip(label: Text(answer)),
                       ),
                     )
                     .toList(),
@@ -64,27 +61,82 @@ class _QuestionWidgetState extends State<QuestionWidget> {
             ],
           ),
         ),
-        ElevatedButton(
-          onPressed: selectedAnswer == null
-              ? null
-              : () {
-                  if (selectedAnswer == widget.question.correctAnswer) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("Correct Answer"),
-                        backgroundColor: Colors.green,
-                      ),
-                    );
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("Wrong Answer"),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
-                  }
-                },
-          child: const Text("Submit"),
+        const SizedBox(height: 20),
+        Center(
+          child: DragTarget<String>(
+            builder: (context, candidateData, rejectedData) {
+              return Container(
+                padding: const EdgeInsets.all(20),
+                margin: const EdgeInsets.symmetric(horizontal: 50),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: Theme.of(context).primaryColor,
+                    width: 2,
+                  ),
+                ),
+                child: Text(
+                  selectedAnswer ?? "Drag your answer here",
+                  style: const TextStyle(fontSize: 14),
+                  textAlign: TextAlign.center,
+                ),
+              );
+            },
+            onWillAccept: (data) {
+              return true;
+            },
+            onAccept: (data) {
+              setState(() {
+                selectedAnswer = data;
+              });
+            },
+          ),
+        ),
+        const SizedBox(height: 20),
+        Center(
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Theme.of(context).primaryColor,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 10),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+            ),
+            onPressed: selectedAnswer == null
+                ? null
+                : () async {
+                    if (selectedAnswer == widget.question.correctAnswer) {
+                      await AwesomeDialog(
+                        context: context,
+                        dialogType: DialogType.success,
+                        title: "Correct Answer",
+                        desc: "You got it right!",
+                        autoDismiss: true,
+                        dismissOnTouchOutside: true,
+                        dismissOnBackKeyPress: true,
+                        animType: AnimType.bottomSlide,
+                        autoHide: const Duration(seconds: 1),
+                      ).show();
+                      quizController.next(answer: true);
+                    } else {
+                      await AwesomeDialog(
+                        context: context,
+                        dialogType: DialogType.error,
+                        title: "Wrong Answer",
+                        desc: "You got it wrong!",
+                        autoDismiss: true,
+                        dismissOnTouchOutside: true,
+                        dismissOnBackKeyPress: true,
+                        animType: AnimType.bottomSlide,
+                        autoHide: const Duration(seconds: 1),
+                      ).show();
+                      quizController.next(answer: false);
+                    }
+                  },
+            child: const Text("Submit"),
+          ),
         ),
       ],
     );
