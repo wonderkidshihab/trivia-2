@@ -2,7 +2,7 @@
 import 'dart:convert';
 
 class HistoryModel {
-  final int id;
+  final String id;
   final int score;
   final DateTime date;
   HistoryModel({
@@ -13,7 +13,7 @@ class HistoryModel {
 
 
   HistoryModel copyWith({
-    int? id,
+    String? id,
     int? score,
     DateTime? date,
   }) {
@@ -34,7 +34,7 @@ class HistoryModel {
 
   factory HistoryModel.fromMap(Map<String, dynamic> map) {
     return HistoryModel(
-      id: map['id'] as int,
+      id: map['id'] as String,
       score: map['score'] as int,
       date: DateTime.fromMillisecondsSinceEpoch(map['date'] as int),
     );

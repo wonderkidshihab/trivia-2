@@ -1,23 +1,12 @@
 import 'package:get/get.dart';
 
 class GameoverController extends GetxController {
-  //TODO: Implement GameoverController
-
-  final count = 0.obs;
+  final score = 0.obs;
+  
   @override
   void onInit() {
     super.onInit();
-  }
 
-  @override
-  void onReady() {
-    super.onReady();
+    score.value = Get.arguments;
   }
-
-  @override
-  void onClose() {
-    super.onClose();
-  }
-
-  void increment() => count.value++;
 }
