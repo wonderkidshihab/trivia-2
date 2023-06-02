@@ -27,14 +27,18 @@ class QuizController extends GetxController
 
   Future<void> fetchQuestions() async {
     List<QuestionModel> questions = await _questionRepository.getQuestions();
-    change(questions, status: RxStatus.success());
-    Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (this.timer.value == 0) {
-        next(answer: false);
-      } else {
-        this.timer.value = this.timer.value - 1;
-      }
-    });
+    if (questions.isNotEmpty) {
+      change(questions, status: RxStatus.success());
+      Timer.periodic(const Duration(seconds: 1), (timer) {
+        if (this.timer.value == 0 && answers.length < state!.length) {
+          next(answer: false);
+        } else {
+          this.timer.value = this.timer.value - 1;
+        }
+      });
+    } else {
+      change([], status: RxStatus.empty());
+    }
   }
 
   void next({required bool answer}) {

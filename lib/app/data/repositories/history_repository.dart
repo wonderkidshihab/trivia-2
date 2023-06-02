@@ -5,8 +5,8 @@ class HistoryRepository {
   Future<List<HistoryModel>> getHistory() async {
     GetStorage box = GetStorage("history");
     final List<HistoryModel> history = [];
-    for (var item in box.getKeys<List<String>>()) {
-      history.add(HistoryModel.fromMap(box.read(item)));
+    for (var item in box.getValues()) {
+      history.add(HistoryModel.fromMap(item as Map<String, dynamic>));
     }
     return history;
   }

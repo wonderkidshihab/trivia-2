@@ -1,23 +1,24 @@
 import 'package:get/get.dart';
+import 'package:trivia/app/data/models/history_model.dart';
+import 'package:trivia/app/data/repositories/history_repository.dart';
 
-class HistoryController extends GetxController {
-  //TODO: Implement HistoryController
+class HistoryController extends GetxController
+    with StateMixin<List<HistoryModel>> {
+  final HistoryRepository _historyRepository = HistoryRepository();
 
-  final count = 0.obs;
   @override
-  void onInit() {
+  void onInit() async {
+    change(null, status: RxStatus.loading());
+    fetchHistory();
     super.onInit();
   }
 
-  @override
-  void onReady() {
-    super.onReady();
+  Future<void> fetchHistory() async {
+    List<HistoryModel> history = await _historyRepository.getHistory();
+    if (history.isEmpty) {
+      change([], status: RxStatus.empty());
+    } else {
+      change(history, status: RxStatus.success());
+    }
   }
-
-  @override
-  void onClose() {
-    super.onClose();
-  }
-
-  void increment() => count.value++;
 }
