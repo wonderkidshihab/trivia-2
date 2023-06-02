@@ -14,14 +14,23 @@ class HomeView extends GetView<HomeController> {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const SizedBox(height: 100, width: double.infinity),
+          const SizedBox(width: double.infinity),
+          CircleAvatar(
+            radius: 100,
+            child: Image.asset(
+              "assets/images/logo.jpg",
+              height: 200,
+              width: 200,
+            ),
+          ),
+          const SizedBox(height: 20),
           const Text("Trivia Quiz", style: TextStyle(fontSize: 30)),
           const SizedBox(height: 50),
           ElevatedButton(
             onPressed: () => Get.toNamed(Routes.QUIZ),
             child: const Text("Start Quiz"),
           ),
-          const SizedBox(height: 50),
+          const SizedBox(height: 20),
           ElevatedButton(
             onPressed: () => Get.toNamed(Routes.HISTORY),
             child: const Text("History"),
