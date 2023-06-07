@@ -7,6 +7,7 @@ abstract class Routes {
   static const GAMEOVER = _Paths.GAMEOVER;
   static const QUIZ = _Paths.QUIZ;
   static const HISTORY = _Paths.HISTORY;
+  static const SHADER = _Paths.SHADER;
 }
 
 abstract class _Paths {
@@ -15,4 +16,5 @@ abstract class _Paths {
   static const GAMEOVER = '/gameover';
   static const QUIZ = '/quiz';
   static const HISTORY = '/history';
+  static const SHADER = '/shader';
 }

@@ -8,6 +8,8 @@ import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
 import '../modules/quiz/bindings/quiz_binding.dart';
 import '../modules/quiz/views/quiz_view.dart';
+import '../modules/shader/bindings/shader_binding.dart';
+import '../modules/shader/views/shader_view.dart';
 
 part 'app_routes.dart';
 
@@ -36,6 +38,11 @@ class AppPages {
       name: _Paths.HISTORY,
       page: () => const HistoryView(),
       binding: HistoryBinding(),
+    ),
+    GetPage(
+      name: _Paths.SHADER,
+      page: () => const ShaderView(),
+      binding: ShaderBinding(),
     ),
   ];
 }

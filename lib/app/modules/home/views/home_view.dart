@@ -35,6 +35,11 @@ class HomeView extends GetView<HomeController> {
             onPressed: () => Get.toNamed(Routes.HISTORY),
             child: const Text("History"),
           ),
+          const SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: () => Get.toNamed(Routes.SHADER),
+            child: const Text("Shader"),
+          ),
         ],
       ),
     );
