@@ -4,50 +4,56 @@
 
 uniform vec2 uSize;
 uniform vec4 uColor;
-uniform float uTime; // Add this line
+uniform float uSpeed;
+uniform float uCloudSize;
 
 out vec4 FragColor;
-
-
-vec4 getBackgroundCOLOR() {
-    vec2 uv = fragCoord.xy / uSize;
-    vec2 pos = (uv.xy - 0.5);
-    vec2 cir = ((pos.xy * pos.xy + sin(uv.x * 18.0 + uTime) / 25.0 * sin(uv.y * 7.0 + uTime * 1.5) / 1.0) + uv.x * sin(uTime) / 16.0 + uv.y * sin(uTime * 1.2) / 16.0);
-    float circles = (sqrt(abs(cir.x + cir.y * 0.5) * 25.0) * 5.0);
-    return vec4(sin(circles * 1.25 + 2.0), abs(sin(circles * 1.0 - 1.0) - sin(circles)), abs(sin(circles) * 1.0), 1.0);
+// Hash function
+float hash(vec2 p) {
+    return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
 }
 
-vec4 getFractalCOLOR() {
-    vec2 pixel = FlutterFragCoord() / uSize;
-    float scale = 1.0 / uTime; // Use uTime here to modify the scale
-    float x = (pixel.x - 0.5) * scale + 0.25;
-    float y = (pixel.y - 0.5) * scale * uSize.y / uSize.x;
-    vec2 z = vec2(x, y);
-    vec2 c = vec2(-0.74543, 0.11301);
-    vec2 v = vec2(0.0);
-    float i = 0.0;
-    for (int n = 0; n < 100; n++) {
-        if (i > 1.0) {
-            break;
-        }
-        v = vec2(v.x * v.x - v.y * v.y, 2.0 * v.x * v.y) + c;
-        if (dot(v, v) > 4.0) {
-            break;
-        }
-        i += 0.01;
-    }
-    return vec4(i, i, i, 1.0);
+// Interpolation function
+float smoothstep(float edge0, float edge1, float x) {
+    float t = clamp((x - edge0) / (edge1 - edge0), 0.0, 1.0);
+    return t * t * (3.0 - 2.0 * t);
 }
 
-void mainImage(out vec4 fragColor, in vec2 fragCoord)
-{
-    vec4 background = getBackgroundCOLOR();
-    vec4 fractal = getFractalCOLOR();
-
-    fragColor = mix(background, fractal, 0.5);
+// Perlin noise function
+float perlin(vec2 p) {
+    vec2 i = floor(p);
+    vec2 f = fract(p);
+    
+    // Four corners in 2D space
+    float a = hash(i);
+    float b = hash(i + vec2(1.0, 0.0));
+    float c = hash(i + vec2(0.0, 1.0));
+    float d = hash(i + vec2(1.0, 1.0));
+    
+    // Smooth the position within each grid cell
+    vec2 u = smoothstep(0.0, 1.0, f);
+    
+    // Interpolate gradients
+    float x1 = mix(a, b, u.x);
+    float x2 = mix(c, d, u.x);
+    float y = mix(x1, x2, u.y);
+    
+    return y;
 }
+
+
 void main() {
-    mainImage(FragColor, FlutterFragCoord());
+    // FlutterFragCoord() returns the coordinate of the current fragment in
+    // Create a perlin noise value based on the current fragment's position
+    float noise = perlin(FlutterFragCoord() * uCloudSize + uSpeed);
+
+    // Use the noise value to create a color with uColor as the base
+    vec4 color = vec4(uColor.r - noise, uColor.g - noise, uColor.b - noise, uColor.a);
+
+    // Set the output color
+    FragColor = color;
+
+
 }
 
 
